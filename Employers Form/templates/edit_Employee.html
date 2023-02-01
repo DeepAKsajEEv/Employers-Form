@@ -1,0 +1,80 @@
+{%extends 'index.html'%}
+{%block content%}
+        <section style="margin-top:50px;padding: 5%2%;">
+            <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header" style="text-align: center;">
+                    <h4 class=" fw-normal">Employee Form of {{user.firstname}}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% load crispy_forms_tags %}
+                        <ul class="list-unstyled mt-3 mb-4">
+                        {% csrf_token %}
+                            <div class="row">
+                                <div class="col-lg-4">{{form.firstname|as_crispy_field}}</div>
+                                <div class="col-lg-4">{{form.lastname|as_crispy_field}}</div>
+                                <div class="col-lg-4">{{form.photo|as_crispy_field}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">{{form.email|as_crispy_field}}</div>
+                                <div class="col-lg-6">{{form.phone_number|as_crispy_field}}</div>
+                            </div>
+                            <div style="margin-top:19px">{{form.date_of_birth|as_crispy_field}}</div>
+                            <div class="row">
+                                <div class="col-lg-6">{{form.country|as_crispy_field}}</div>
+                                
+                                 <div class="col-lg-6">
+                                     <label style="margin-bottom: 8px;">Select a Province/State</label>
+                                     <select id="id_province" class="form-control select form-select" name="state">
+                                        <option value={{user.state}}>{{user.state}}</option>
+                                       
+                                     </select>
+                                   
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:15px">
+                                <div class="col-lg-6" style="padding-top:70px;">
+                                    <b>Professional Skills</b>
+                                </div>
+                                <div class="col-lg-6">{{form.professional_skills|as_crispy_field}}</div>
+                            </div>
+                            
+                        </ul>
+                        <button type="submit" class="w-100 btn btn-lg btn-dark">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+
+
+        {% block javascript %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>   
+  <script type="text/javascript">
+
+    $("#id_country").change(function () {
+        var country = $(this).val();
+
+$.ajax({
+          type: "POST",
+          url: "{% url 'get-province' %}",
+          data: {
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+            'country': country
+          },
+          success: function (data) {
+            console.log(data.provinces);
+            let html_data = '<option value="-----">Select Province/State</option>';
+            data.provinces.forEach(function (data) {
+                html_data += `<option value="${data}">${data}</option>`
+            });
+            $("#id_province").html(html_data);
+          }
+        });
+
+});
+
+</script>
+{% endblock javascript %}
+{%endblock%}
